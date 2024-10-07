@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "pt.ipca.calculadora"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "pt.ipca.calculadora"
@@ -66,4 +66,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1") // Check for the latest version
+
+
 }
