@@ -26,7 +26,7 @@ fun BotaoCalculadora(symbol: String, modifier: Modifier, onClick: () -> Unit) {
 
         Text(
             text = symbol,
-            fontsize = 36.sp,
+            fontSize = 36.sp,
             color = Color.White
         )
 
