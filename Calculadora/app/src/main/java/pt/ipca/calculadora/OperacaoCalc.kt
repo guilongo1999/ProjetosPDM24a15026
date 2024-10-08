@@ -6,6 +6,7 @@ sealed class OperacaoCalc(val symbol: String){
     object Subtract: OperacaoCalc("-")
     object Multiply: OperacaoCalc("*")
     object Divide: OperacaoCalc("/")
+    object Square: OperacaoCalc("√ ")
 
 
 }

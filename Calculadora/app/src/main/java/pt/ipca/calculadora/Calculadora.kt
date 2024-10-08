@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.w3c.dom.Text
 
 @Composable
 
@@ -34,7 +33,7 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
         verticalArrangement = Arrangement.spacedBy(buttonSpacing) //ajustar depois
         ) {
             Text(
-                text= state.number1 + (state.operacao ?: "") + state.number2,
+                text= state.number1 + (state.operacao?.symbol ?: "") + state.number2,
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -50,12 +49,15 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
                 horizontalArrangement = Arrangement.spacedBy(buttonSpacing) //ajustar depois
             ) {
 
-                BotaoCalculadora(
-                    symbol = "AC",
+                BotaoCalculadoraEspecial(
+                    symbol = "MRC",
                     modifier = Modifier
-                        .background(Grey)
-                        .aspectRatio(2f)
-                        .weight(2f),
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+
+
 
                     onClick = {
 
@@ -66,9 +68,9 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
                 )
 
                 BotaoCalculadora(
-                    symbol = "Del",
+                    symbol = "M-",
                     modifier = Modifier
-                        .background(Grey)
+                        .background(Black)
                         .aspectRatio(1f)
                         .weight(1f),
 
@@ -81,7 +83,22 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
                 )
 
                 BotaoCalculadora(
-                    symbol = "/",
+                    symbol = "M+",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Operacao(OperacaoCalc.Divide))
+
+                    }
+
+                )
+
+                BotaoCalculadoraEspecial(
+                    symbol = "ON/C",
                     modifier = Modifier
                         .background(Orange)
                         .aspectRatio(1f)
@@ -89,7 +106,74 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
 
                     onClick = {
 
+                        onAction(AcaoCalc.Clear)
+
+                    }
+
+                )
+
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(buttonSpacing) //ajustar depois
+            ) {
+
+                BotaoCalculadora(
+                    symbol = "√ ",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Operacao(OperacaoCalc.Square))
+
+                    }
+
+                )
+
+                BotaoCalculadora(
+                    symbol = "%",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Delete)
+
+                    }
+
+                )
+
+                BotaoCalculadora(
+                    symbol = "+/-",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
                         onAction(AcaoCalc.Operacao(OperacaoCalc.Divide))
+
+                    }
+
+                )
+
+                BotaoCalculadora(
+                    symbol = "CE",
+                    modifier = Modifier
+                        .background(Orange)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Clear)
 
                     }
 
@@ -147,6 +231,21 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
 
                 )
 
+                BotaoCalculadora(
+                    symbol = "/",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Operacao(OperacaoCalc.Divide))
+
+                    }
+
+                )
+
             }
 
             Row(
@@ -194,6 +293,21 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
                     onClick = {
 
                         onAction(AcaoCalc.Number(6))
+
+                    }
+
+                )
+
+                BotaoCalculadora(
+                    symbol = "*",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Operacao(OperacaoCalc.Multiply))
 
                     }
 
@@ -250,6 +364,94 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
                     }
 
                 )
+
+                BotaoCalculadora(
+                    symbol = "-",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Operacao(OperacaoCalc.Subtract))
+
+                    }
+
+                )
+
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(buttonSpacing) //ajustar depois
+            ) {
+
+                BotaoCalculadora(
+                    symbol = "0",
+                    modifier = Modifier
+                        .background(Grey)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Number(0))
+
+                    }
+
+                )
+
+                BotaoCalculadora(
+                    symbol = ".",
+                    modifier = Modifier
+                        .background(Grey)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Decimal)
+
+                    }
+
+                )
+
+                BotaoCalculadora(
+                    symbol = "=",
+                    modifier = Modifier
+                        .background(Grey)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Calculate)
+
+                    }
+
+
+
+                )
+
+                BotaoCalculadora(
+                    symbol = "+",
+                    modifier = Modifier
+                        .background(Black)
+                        .aspectRatio(1f)
+                        .weight(1f),
+
+                    onClick = {
+
+                        onAction(AcaoCalc.Operacao(OperacaoCalc.Add))
+
+                    }
+
+
+
+                )
+
+
 
             }
 
