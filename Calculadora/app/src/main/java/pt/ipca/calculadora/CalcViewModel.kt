@@ -13,8 +13,11 @@ class CalcViewModel: ViewModel() {
     var state by mutableStateOf(EstadoCalc())
         private set
 
-    fun onAction(action: AcaoCalc) {
+    var isOn by mutableStateOf(false)
+        private set
 
+    fun onAction(action: AcaoCalc) {
+        if (!isOn && action !is AcaoCalc.On) return
 
         when(action) {
 
@@ -25,6 +28,7 @@ class CalcViewModel: ViewModel() {
             is AcaoCalc.Calculate -> performCalculation()
             is AcaoCalc.Delete -> performDeletion()
             //is OperacaoCalc.Square -> sqrt(number1)
+            is AcaoCalc.On -> TurnOn()
             null -> return
         }
     }
@@ -54,7 +58,8 @@ class CalcViewModel: ViewModel() {
                 is OperacaoCalc.Subtract -> number1-number2
                 is OperacaoCalc.Multiply -> number1 * number2
                 is OperacaoCalc.Divide -> number1 / number2
-                is OperacaoCalc.Square -> sqrt(number1)
+                is OperacaoCalc.Square -> number1 * sqrt(number2)
+
                 null -> return
 
             }
@@ -117,6 +122,24 @@ class CalcViewModel: ViewModel() {
         }
 
         state = state.copy(number2 = state.number2 + number)
+
+    }
+
+    private fun TurnOn() {
+
+        if(!isOn) {
+
+            isOn = true
+            state = EstadoCalc()
+
+        }
+
+        else {
+
+            isOn = false
+            state = EstadoCalc()
+        }
+
 
     }
 

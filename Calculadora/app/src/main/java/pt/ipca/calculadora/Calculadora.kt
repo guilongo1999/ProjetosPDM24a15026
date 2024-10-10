@@ -105,8 +105,8 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
                         .weight(1f),
 
                     onClick = {
-
-                        onAction(AcaoCalc.Clear)
+                        
+                        onAction(AcaoCalc.On)
 
                     }
 

@@ -7,6 +7,9 @@ sealed class AcaoCalc {
     object Delete: AcaoCalc()
     object Decimal: AcaoCalc()
     object Calculate: AcaoCalc()
+
+    object On: AcaoCalc()
+
     //object Square: AcaoCalc()
     data class Operacao(val operacao: OperacaoCalc) : AcaoCalc()
 
