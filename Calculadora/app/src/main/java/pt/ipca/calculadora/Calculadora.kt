@@ -33,7 +33,7 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
         verticalArrangement = Arrangement.spacedBy(buttonSpacing) //ajustar depois
         ) {
             Text(
-                text= state.number1 + (state.operacao?.symbol ?: "") + state.number2,
+                text= state.number1 + (state.operacao?.symbol ?: "")   + state.number2,
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -61,7 +61,7 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
 
                     onClick = {
 
-                        onAction(AcaoCalc.Clear)
+                        onAction(AcaoCalc.Memory)
 
                     }
 
@@ -76,7 +76,7 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
 
                     onClick = {
 
-                        onAction(AcaoCalc.Delete)
+                        onAction(AcaoCalc.RemoveMemory)
 
                     }
 
@@ -91,7 +91,7 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
 
                     onClick = {
 
-                        onAction(AcaoCalc.Operacao(OperacaoCalc.Divide))
+                        onAction(AcaoCalc.AddMemory)
 
                     }
 
@@ -143,7 +143,7 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
 
                     onClick = {
 
-                        onAction(AcaoCalc.Delete)
+                        onAction(AcaoCalc.Percent)
 
                     }
 
@@ -158,7 +158,7 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
 
                     onClick = {
 
-                        onAction(AcaoCalc.Operacao(OperacaoCalc.Divide))
+                        onAction(AcaoCalc.ChangeSignal)
 
                     }
 

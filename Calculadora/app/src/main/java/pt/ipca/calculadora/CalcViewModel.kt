@@ -16,6 +16,11 @@ class CalcViewModel: ViewModel() {
     var isOn by mutableStateOf(false)
         private set
 
+    var changeSignal by mutableStateOf(false)
+        private set
+
+    private var memory: Double = 0.0
+
     fun onAction(action: AcaoCalc) {
         if (!isOn && action !is AcaoCalc.On) return
 
@@ -29,6 +34,11 @@ class CalcViewModel: ViewModel() {
             is AcaoCalc.Delete -> performDeletion()
             //is OperacaoCalc.Square -> sqrt(number1)
             is AcaoCalc.On -> TurnOn()
+            is AcaoCalc.Percent -> PerformPercent()
+            is AcaoCalc.ChangeSignal -> ChangeSignal()
+            is AcaoCalc.AddMemory -> AddMem()
+            is AcaoCalc.RemoveMemory -> RemoveMem()
+            is AcaoCalc.Memory -> Mem()
             null -> return
         }
     }
@@ -58,13 +68,12 @@ class CalcViewModel: ViewModel() {
                 is OperacaoCalc.Subtract -> number1-number2
                 is OperacaoCalc.Multiply -> number1 * number2
                 is OperacaoCalc.Divide -> number1 / number2
-                is OperacaoCalc.Square -> number1 * sqrt(number2)
-
+                is OperacaoCalc.Square -> number1 * sqrt(number1)
                 null -> return
 
             }
 
-            state = state.copy(number1 = result.toString().take(15), number2 = "", operacao = null)
+            state = state.copy(number1 = result.toString().take(5), number2 = "", operacao = null)
         }
 
     }
@@ -92,7 +101,7 @@ class CalcViewModel: ViewModel() {
         if(!state.number2.contains(".") && state.number2.isNotBlank()) {
 
 
-            state = state.copy(number1 = state.number2 + ".")
+            state = state.copy(number2 = state.number2 + ".")
 
 
 
@@ -139,6 +148,68 @@ class CalcViewModel: ViewModel() {
             isOn = false
             state = EstadoCalc()
         }
+
+
+    }
+
+    private fun PerformPercent() {
+
+        //val count
+        //val totalCount
+        //var percentage = (count.toDouble() / totalCount.toDouble()) * 100.0
+
+        val number = state.number1.toDoubleOrNull()
+        if (number != null) {
+            state = state.copy(number1 = (number / 100).toString())
+        }
+
+
+
+    }
+
+
+    private fun ChangeSignal() {
+        if (state.operacao == null) {
+            // Change signal of number1
+            state = if (state.number1.startsWith("-")) {
+                state.copy(number1 = state.number1.removePrefix("-"))
+            } else {
+                state.copy(number1 = "-${state.number1}")
+            }
+        } else {
+            // Change signal of number2
+            state = if (state.number2.startsWith("-")) {
+                state.copy(number2 = state.number2.removePrefix("-"))
+            } else {
+                state.copy(number2 = "-${state.number2}")
+            }
+        }
+    }
+
+    private fun AddMem(): Double {
+
+        val currentNumber = state.number1.toDoubleOrNull()
+        if (currentNumber != null) {
+            memory += currentNumber
+        }
+        return memory
+
+    }
+
+    private fun RemoveMem(): Double {
+
+
+        val currentNumber = state.number1.toDoubleOrNull()
+        if (currentNumber != null) {
+            memory -= currentNumber
+        }
+        return memory
+
+    }
+
+    private fun Mem() {
+
+        state = state.copy(number1 = memory.toString())
 
 
     }

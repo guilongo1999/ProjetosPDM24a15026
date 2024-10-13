@@ -9,4 +9,6 @@ sealed class OperacaoCalc(val symbol: String){
     object Square: OperacaoCalc("√ ")
 
 
+
+
 }

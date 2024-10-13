@@ -10,6 +10,18 @@ sealed class AcaoCalc {
 
     object On: AcaoCalc()
 
+    object Percent: AcaoCalc()
+
+    object ChangeSignal: AcaoCalc()
+
+    object AddMemory: AcaoCalc()
+
+    object RemoveMemory: AcaoCalc()
+
+    object Memory: AcaoCalc()
+
+
+
     //object Square: AcaoCalc()
     data class Operacao(val operacao: OperacaoCalc) : AcaoCalc()
 
