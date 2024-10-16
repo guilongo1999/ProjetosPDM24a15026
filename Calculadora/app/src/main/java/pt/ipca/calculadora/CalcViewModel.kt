@@ -59,6 +59,7 @@ class CalcViewModel: ViewModel() {
        val number1  = state.number1.toDoubleOrNull()
         val number2 = state.number2.toDoubleOrNull()
 
+
         if(number1 != null && number2 != null) {
 
         val result = when(state.operacao) {
@@ -68,12 +69,13 @@ class CalcViewModel: ViewModel() {
                 is OperacaoCalc.Subtract -> number1-number2
                 is OperacaoCalc.Multiply -> number1 * number2
                 is OperacaoCalc.Divide -> number1 / number2
-                is OperacaoCalc.Square -> number1 * sqrt(number1)
+                is OperacaoCalc.Square -> number1 * sqrt(number2)
                 null -> return
 
             }
 
             state = state.copy(number1 = result.toString().take(5), number2 = "", operacao = null)
+
         }
 
     }

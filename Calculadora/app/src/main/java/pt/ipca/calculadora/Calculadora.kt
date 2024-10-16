@@ -33,7 +33,11 @@ fun Calc(state: EstadoCalc, modifier: Modifier = Modifier, buttonSpacing: Dp = 8
         verticalArrangement = Arrangement.spacedBy(buttonSpacing) //ajustar depois
         ) {
             Text(
-                text= state.number1 + (state.operacao?.symbol ?: "")   + state.number2,
+                    text = if (state.operacao == null || state.number2.isBlank()) {
+                        state.number1 // Exibe `number1` se nenhuma operação estiver ativa ou `number2` ainda não foi digitado
+                    } else {
+                        state.number2 // Exibe `number2` se uma operação estiver ativa e `number2` estiver sendo digitado
+                    },
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .fillMaxWidth()
