@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.w3c.dom.Text
 
 @Composable
@@ -26,11 +27,14 @@ fun RetryContent(
         modifier = modifier
     ) {
 
-        Text(text = error, color = Color.Red, fontSize = 18.dp)
+        Text(text = error, color = Color.Red, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onRetry, modifier = Modifier.align(CenterHorizontally)) {
 
             Text(text = "Retry")
+
+
+
         }
     }
 }

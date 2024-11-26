@@ -16,14 +16,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import pt.ipca.experiencia9.domain.model.Data
+//import pt.ipca.experiencia9.domain.model.Data
+import pt.ipca.experiencia9.domain.model.Multimedia
+import pt.ipca.experiencia9.domain.model.Result
+
 
 @Composable
 fun NewsArticleCard(
 
     modifier: Modifier = Modifier,
-    data:Data,
-    onCarClicked: (Data) -> Unit
+    data:Result,
+    onCarClicked: (Result) -> Unit
 
 ) {
 
@@ -36,7 +39,7 @@ fun NewsArticleCard(
 
             modifier = modifier.padding(12.dp)
         ) {
-            ImageHolder(ImageUrl = data.imageUrl)
+            ImageHolder(ImageUrl = data.multimedia.firstOrNull()?.url ?: "")
             Text(
 
                 text = data.title,
@@ -53,14 +56,14 @@ fun NewsArticleCard(
             ) {
                 Text(
 
-                    text = data.publishedAt ?: "",
+                    text = data.updatedDate ?: "",
                     style = MaterialTheme.typography.bodySmall,
 
                     )
 
                 Text(
 
-                    text = data.publishedAt ?: "",
+                    text = data.section ?: "",
                     style = MaterialTheme.typography.bodySmall,
 
                 )

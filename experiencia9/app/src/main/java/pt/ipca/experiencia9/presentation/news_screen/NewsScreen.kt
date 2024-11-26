@@ -26,10 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
-import pt.ipca.experiencia9.domain.model.Data
+//import pt.ipca.experiencia9.domain.model.Data
+import pt.ipca.experiencia9.domain.model.Result
 import pt.ipca.experiencia9.presentation.component.CategoryTabRow
 import pt.ipca.experiencia9.presentation.component.NewsArticleCard
 import pt.ipca.experiencia9.presentation.component.NewsScreenTopBar
+import pt.ipca.experiencia9.presentation.component.RetryContent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -42,11 +44,13 @@ fun NewsScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val pagerState = rememberPagerState()
-    val categories = listOf("general", "business", "health", "science", "sports", "tech", "entertainment", "politics", "food", "travel")
+    val categories = listOf("home", "business", "health", "science", "sports", "technology",
+        "politics", "food", "travel", "arts", "automobiles", "books/review", "fashion", "insider", "magazine", "movies", "nyregion",
+        "obituaries", "opinion", "realestate", "sundayreview", "theater", "t-magazine", "upshot", "us", "world")
 
     LaunchedEffect(key1 = pagerState) {
 
-        snapshotFlow { pagerState.currentPage }.collect {page -> onEvent(NewsScreenEvent.onCategoryChange(category = categories[page]))
+        snapshotFlow { pagerState.currentPage }.collect {page -> onEvent(NewsScreenEvent.onCategoryChange(categories[page]))
 
         }
     }
@@ -80,18 +84,19 @@ fun NewsScreen(
                 )
 
 
-         HorizontalPager(
-
-             pageCount = categories.size,
-             state = pagerState,
-
-             )
-
-         {
-
-            NewsArticlesList(state = state, onCardClicked = {})
-
-                 }
+                HorizontalPager(
+                    pageCount = categories.size,
+                    state = pagerState,
+                    modifier = Modifier.weight(1f)
+                ) { page ->
+                    NewsArticlesList(
+                        state = state,
+                        onCardClicked = {},
+                        onRetry = {
+                            onEvent(NewsScreenEvent.onCategoryChange(categories[page]))
+                        }
+                    )
+                }
              }
         }
 
@@ -102,7 +107,8 @@ fun NewsScreen(
 fun NewsArticlesList(
 
     state: NewsScreenState,
-    onCardClicked: (Data) -> Unit
+    onCardClicked: (Result) -> Unit,
+    onRetry: () -> Unit
 ) {
 
 
@@ -127,6 +133,11 @@ fun NewsArticlesList(
         if(state.isLoading) {
 
             CircularProgressIndicator()
+        }
+
+        if(state.error != null) {
+            
+            RetryContent(error = state.error, onRetry =  onRetry )
         }
 
     }
