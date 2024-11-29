@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 //import pt.ipca.experiencia9.domain.model.Data
 import pt.ipca.experiencia9.domain.model.Multimedia
 import pt.ipca.experiencia9.domain.model.Result
+import pt.ipca.experiencia9.util.DateFormatter
 
 
 @Composable
@@ -31,6 +32,7 @@ fun NewsArticleCard(
 ) {
 
 
+    val date = DateFormatter(data.updatedDate)
     Card(
         modifier = modifier.clickable { onCarClicked(data) }
     ) {
@@ -56,7 +58,7 @@ fun NewsArticleCard(
             ) {
                 Text(
 
-                    text = data.updatedDate ?: "",
+                    text = date,
                     style = MaterialTheme.typography.bodySmall,
 
                     )

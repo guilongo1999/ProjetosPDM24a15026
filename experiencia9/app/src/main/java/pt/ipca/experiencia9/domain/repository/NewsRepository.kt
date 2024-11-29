@@ -9,4 +9,8 @@ interface NewsRepository {
     suspend fun getTopHeadlines(
         category: String
     ): Resource<List<Result>>
+
+    suspend fun searchForNews(
+        query: String
+    ): Resource<List<Result>>
 }

@@ -18,6 +18,15 @@ interface NewsApi {
 
     ):NewsResponse
 
+    @GET("everything")
+    suspend fun searchForNews(
+
+       // @Path("section") section: String,
+        @Query("q") query:String,
+        @Query("api-key") apikey:String = API_KEY,
+
+        ):NewsResponse
+
 
     companion object {
 

@@ -24,5 +24,21 @@ class NewsRepositoryImplementation(
             Resource.Error("Failed to fetch News ${e.message}")
         }
 
+
+
+    }
+
+    override suspend fun searchForNews(query: String): Resource<List<Result>> {
+
+        return try{
+            val response = NewsApi.searchForNews(query = query)
+            Resource.Success(response.results)
+        }catch (e:Exception) {
+            Resource.Error("Failed to fetch News ${e.message}")
+        }
+
+
+
+
     }
 }

@@ -10,8 +10,10 @@ import kotlinx.coroutines.launch
 import pt.ipca.experiencia9.util.Resource
 import androidx.compose.runtime.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import pt.ipca.experiencia9.domain.model.Result
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 
 @HiltViewModel
 class NewsScreenViewModel @Inject constructor(
@@ -20,9 +22,11 @@ class NewsScreenViewModel @Inject constructor(
 
     var state by mutableStateOf(NewsScreenState())
 
-    init {
-        getNewsArticles(category = "home")
-    }
+    private var searchJob: Job? = null
+
+  //  init {
+   //     getNewsArticles(category = "home")
+   // }
 
     fun onEvent(event: NewsScreenEvent) {
         when (event) {
@@ -30,17 +34,26 @@ class NewsScreenViewModel @Inject constructor(
                 state = state.copy(category = event.section)
                 getNewsArticles(state.category)
             }
+
+
             NewsScreenEvent.onCloseIconClicked -> {
-                // TODO: Implement onCloseIconClicked functionality
+                state = state.copy(isSearchBarVisible = false)
+                getNewsArticles(category = state.category)
             }
             is NewsScreenEvent.onNewsCardClicked -> {
-                // TODO: Handle card click event
+                state = state.copy(selectedArticle = event.data)
             }
             NewsScreenEvent.onSearchIconClicked -> {
-                // TODO: Handle search icon click event
+                state = state.copy(isSearchBarVisible = true, datas = emptyList())
             }
             is NewsScreenEvent.onSearchQueryChanged -> {
-                // TODO: Handle search query change
+               state = state.copy(searchQuery = event.searchQuery)
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
+
+                    delay(1000)
+                    searchForNews(query = state.searchQuery)
+                }
             }
         }
     }
@@ -67,6 +80,34 @@ class NewsScreenViewModel @Inject constructor(
             }
         }
     }
+
+    private fun searchForNews(query: String) {
+        if(query.isEmpty()) {
+
+            return
+        }
+        viewModelScope.launch {
+            state = state.copy(isLoading = true, error = null)
+            val result = newsRepository.searchForNews(query = query)
+            when (result) {
+                is Resource.Success -> {
+                    state = state.copy(
+                        datas = result.data ?: emptyList(),
+                        isLoading = false,
+                        error = null
+                    )
+                }
+                is Resource.Error -> {
+                    state = state.copy(
+                        error = result.message,
+                        isLoading = false,
+                        datas = emptyList()
+                    )
+                }
+            }
+        }
+    }
+
 }
 
 /*
