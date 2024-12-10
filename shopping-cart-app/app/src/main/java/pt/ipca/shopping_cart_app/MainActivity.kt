@@ -1,3 +1,5 @@
+/*
+
 package pt.ipca.shopping_cart_app
 
 import android.os.Bundle
@@ -16,24 +18,131 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import pt.ipca.shopping_cart_app.Screens.DefaultPreviewOfSignUpScreen
+import pt.ipca.shopping_cart_app.Screens.SignUpScreen
 import pt.ipca.shopping_cart_app.app.PostOfficeApp
 //import pt.ipca.shopping_cart_app.ui.theme.ShoppingcartappTheme
+
+private const val TAG = "MainActivity"
+
+
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var auth: FirebaseAuth
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        val auth = Firebase.auth
+        Log.i(TAG, "onCreate utilizador atual: ${auth.currentUser}")
+        auth.currentUser
+        auth = FirebaseAuth.getInstance()
+
+
+
+
+
+           auth.createUserWithEmailAndPassword("pedro@gmail.com", "pedro123").addOnCompleteListener {
+
+                 task ->
+
+                 if(task.isSuccessful) {
+
+
+                     Log.i(TAG, "create user: success")
+
+
+                 } else {
+
+                     Log.i(TAG, "create user: falhado -> ${task.exception}")
+                 }
+             }
+
+
+
+
+
+
+       // auth.signInWithEmailAndPassword("pedro@gmail.com", "pedro123")
+
+       // auth.signOut()
+
+
+
         setContent {
 
 
-
-                DefaultPreviewOfSignUpScreen()
+            PostOfficeApp(auth = auth)
 
         }
 
-        auth = Firebase.auth
+
     }
+
+}
+
+*/
+
+package pt.ipca.shopping_cart_app
+
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.google.firebase.auth.FirebaseAuth
+import pt.ipca.shopping_cart_app.app.PostOfficeApp
+
+private const val TAG = "MainActivity"
+
+class MainActivity : ComponentActivity() {
+
+    // Variável para Firebase Authentication
+    private lateinit var auth: FirebaseAuth
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Inicializar Firebase Authentication
+        auth = FirebaseAuth.getInstance()
+        Log.i(TAG, "onCreate utilizador atual: ${auth.currentUser?.email ?: "Nenhum usuário autenticado"}")
+
+        setContent {
+            // Passar a instância de auth para o PostOfficeApp
+            PostOfficeApp(auth = auth)
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//-------------------------------------------------------------------------codigo para binding----------------------------------------------------------------------------------------
+
+    /*
+
 
     private fun createUserWithEmail(email: String, password: String) {
 
@@ -79,5 +188,8 @@ class MainActivity : ComponentActivity() {
         private var TAG = "EmailAndPassword"
     }
 
+
+
 }
 
+*/

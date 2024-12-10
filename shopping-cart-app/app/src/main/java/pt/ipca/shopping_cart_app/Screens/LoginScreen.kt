@@ -1,32 +1,6 @@
-package pt.ipca.shopping_cart_app.Screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import pt.ipca.shopping_cart_app.Components.ButtonComponent
-import pt.ipca.shopping_cart_app.Components.ClickableLoginTextComponent
-import pt.ipca.shopping_cart_app.Components.DividerTextComponent
-import pt.ipca.shopping_cart_app.Components.MyTextFieldComponent
-import pt.ipca.shopping_cart_app.Components.PasswordTextFieldComponent
-import pt.ipca.shopping_cart_app.Components.SignUpText
-import pt.ipca.shopping_cart_app.Components.SignUpToContinueText
-import pt.ipca.shopping_cart_app.Components.UnderlineSignUpText
-import pt.ipca.shopping_cart_app.R
-import pt.ipca.shopping_cart_app.navigation.BackButtonHandler
-import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
-import pt.ipca.shopping_cart_app.navigation.Screen
+
+/*
 
 @Composable
 fun LoginScreen() {
@@ -72,9 +46,136 @@ fun LoginScreen() {
 }
 
 
+*/  //velha implementacao, usar componentes caso necessario
+
+package pt.ipca.shopping_cart_app.Screens
+
+
+
+import android.util.Log
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
+import pt.ipca.shopping_cart_app.Components.CheckBoxComponent
+import pt.ipca.shopping_cart_app.Components.UnderlineSignUpText
+import pt.ipca.shopping_cart_app.R
+import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
+import pt.ipca.shopping_cart_app.navigation.Screen
+
+private const val TAG = "LoginScreen"
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginScreen(
+    onLoginSuccess: (user: com.google.firebase.auth.FirebaseUser?) -> Unit,
+    onNavigateToSignUp: () -> Unit
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val auth = FirebaseAuth.getInstance()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Login", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Email Field
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Password Field
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Login Button
+        Button(
+            onClick = {
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.i(TAG, "Login successful")
+                            onLoginSuccess(auth.currentUser)
+                        } else {
+                            val error = task.exception?.localizedMessage ?: "Login failed"
+                            Log.e(TAG, error)
+                            errorMessage = error
+                        }
+                    }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Login")
+        }
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        CheckBoxComponent(value = stringResource(id = R.string.terms_and_conditions),
+            onTextSelected = {
+
+                PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
+            }
+        )
+
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        // Sign Up Navigation Button
+        TextButton(onClick = onNavigateToSignUp) {
+            Text("Don't have an account? Sign Up")
+        }
+
+        // Error Message
+        if (errorMessage != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = errorMessage ?: "", color = MaterialTheme.colorScheme.error)
+        }
+    }
+}
+
+
+
+
 @Preview
 @Composable
 fun LoginScreenPreview() {
 
-    LoginScreen()
+    LoginScreen(
+       onLoginSuccess = {user ->
+           Log.i(TAG, "Login Success with user: $user")
+       },
+        onNavigateToSignUp = {
+            Log.i(TAG, "Navigating to SignUp Screen")
+        }
+    )
 }
