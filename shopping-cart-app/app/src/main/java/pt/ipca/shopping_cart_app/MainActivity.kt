@@ -94,6 +94,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.google.firebase.auth.FirebaseAuth
 import pt.ipca.shopping_cart_app.app.PostOfficeApp
+import pt.ipca.shopping_cart_app.ui.home.Home
 
 private const val TAG = "MainActivity"
 
@@ -111,7 +112,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             // Passar a instância de auth para o PostOfficeApp
-            PostOfficeApp(auth = auth)
+            //PostOfficeApp(auth = auth)
+            
+            Home(onNavigate = {})
         }
     }
 }
