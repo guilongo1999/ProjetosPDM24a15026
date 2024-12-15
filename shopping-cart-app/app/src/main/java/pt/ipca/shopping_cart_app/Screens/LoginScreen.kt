@@ -69,7 +69,7 @@ import pt.ipca.shopping_cart_app.R
 import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
 import pt.ipca.shopping_cart_app.navigation.Screen
 
-private const val TAG = "LoginScreen"
+private const val LOGIN_TAG = "LoginScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,11 +120,11 @@ fun LoginScreen(
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Log.i(TAG, "Login successful")
+                            Log.i(LOGIN_TAG, "Login successful")
                             onLoginSuccess(auth.currentUser)
                         } else {
                             val error = task.exception?.localizedMessage ?: "Login failed"
-                            Log.e(TAG, error)
+                            Log.e(LOGIN_TAG, error)
                             errorMessage = error
                         }
                     }
@@ -172,10 +172,10 @@ fun LoginScreenPreview() {
 
     LoginScreen(
        onLoginSuccess = {user ->
-           Log.i(TAG, "Login Success with user: $user")
+           Log.i(LOGIN_TAG, "Login Success with user: $user")
        },
         onNavigateToSignUp = {
-            Log.i(TAG, "Navigating to SignUp Screen")
+            Log.i(LOGIN_TAG, "Navigating to SignUp Screen")
         }
     )
 }

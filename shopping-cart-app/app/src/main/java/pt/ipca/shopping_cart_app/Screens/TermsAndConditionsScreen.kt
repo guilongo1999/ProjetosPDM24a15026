@@ -21,7 +21,7 @@ import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
 import pt.ipca.shopping_cart_app.navigation.Screen
 
 
-private const val TAG = "TermsAndConditionsScreen"
+private const val TERMS_TAG = "TermsAndConditionsScreen"
 
 
 @Composable
@@ -76,7 +76,7 @@ fun TermsAndConditionsScreen(onLogout:() -> Unit) {
 @Composable
 fun TermsAndConditionsScreenPreview() {
 
-    TermsAndConditionsScreen(onLogout = {Log.i(TAG, "Login Out")})
+    TermsAndConditionsScreen(onLogout = {Log.i(TERMS_TAG, "Login Out")})
 
 
 

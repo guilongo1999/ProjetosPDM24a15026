@@ -1,7 +1,7 @@
 package pt.ipca.shopping_cart_app.ui.home
 
 import android.annotation.SuppressLint
-import android.widget.CheckBox
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -28,7 +28,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -38,15 +37,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.selects.select
 import pt.ipca.shopping_cart_app.data.room.models.Item
 import pt.ipca.shopping_cart_app.data.room.models.ItemsWithStoreAndList
 import pt.ipca.shopping_cart_app.ui.Category
 import pt.ipca.shopping_cart_app.ui.Utils
-import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.ui.tooling.preview.Preview
+import com.google.firebase.auth.FirebaseAuth
+import pt.ipca.shopping_cart_app.Screens.HomeScreen
+
+
+private const val HOME_TAG = "Home"
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -54,7 +57,9 @@ import androidx.compose.material3.LocalContentColor
 @Composable
 fun Home(
 
-    onNavigate:(Int) -> Unit
+    onNavigate:(Int) -> Unit,
+    auth: FirebaseAuth,
+    onLogout: () -> Unit
 ) {
 
     val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
@@ -213,7 +218,20 @@ fun ShoppingItems(
 
 }
 
-fun formatDate(date: Date): String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
+fun formatDate(date: java.util.Date): String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
 
 
 
+@Preview
+@Composable
+fun HomePreview() {
+
+    val auth = FirebaseAuth.getInstance() //simulado porque e impossivel fazer a autenticacao real no preview
+
+
+    Home(onNavigate = {}, auth = auth, onLogout = {Log.i(HOME_TAG, "Login Out")})
+
+
+
+
+}

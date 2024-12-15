@@ -94,9 +94,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.google.firebase.auth.FirebaseAuth
 import pt.ipca.shopping_cart_app.app.PostOfficeApp
+import pt.ipca.shopping_cart_app.ui.detail.Detail
 import pt.ipca.shopping_cart_app.ui.home.Home
 
-private const val TAG = "MainActivity"
+private const val MAIN_TAG = "MainActivity"
+private const val HOME_TAG = "Home"
 
 class MainActivity : ComponentActivity() {
 
@@ -108,13 +110,13 @@ class MainActivity : ComponentActivity() {
 
         // Inicializar Firebase Authentication
         auth = FirebaseAuth.getInstance()
-        Log.i(TAG, "onCreate utilizador atual: ${auth.currentUser?.email ?: "Nenhum usuário autenticado"}")
+        Log.i(MAIN_TAG, "onCreate utilizador atual: ${auth.currentUser?.email ?: "Nenhum usuário autenticado"}")
 
         setContent {
             // Passar a instância de auth para o PostOfficeApp
             //PostOfficeApp(auth = auth)
             
-            Home(onNavigate = {})
+            Detail(navigateUp = {}, auth = auth, onLogout = {Log.i(HOME_TAG, "Login Out")}, id = 1)
         }
     }
 }

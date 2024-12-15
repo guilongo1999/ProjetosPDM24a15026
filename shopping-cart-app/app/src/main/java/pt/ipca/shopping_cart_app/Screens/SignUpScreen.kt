@@ -138,7 +138,7 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import pt.ipca.shopping_cart_app.Components.UnderlineSignUpText
 
-private const val TAG = "SignUpScreen"
+const val SIGN_UP_TAG = "SignUpScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -205,11 +205,11 @@ fun SignUpScreen(
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Log.i(TAG, "Sign up successful")
+                            Log.i(SIGN_UP_TAG, "Sign up successful")
                             onSignUpSuccess(auth.currentUser)
                         } else {
                             val error = task.exception?.localizedMessage ?: "Sign up failed"
-                            Log.e(TAG, error)
+                            Log.e(SIGN_UP_TAG, error)
                             errorMessage = error
                         }
                     }

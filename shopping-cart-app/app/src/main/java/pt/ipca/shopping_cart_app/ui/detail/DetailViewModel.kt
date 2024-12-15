@@ -18,6 +18,8 @@ import pt.ipca.shopping_cart_app.ui.repository.Repository
 //import java.util.Date
 //import java.sql.Date
 import java.time.LocalDate
+import pt.ipca.shopping_cart_app.data.room.models.ItemsWithStoreAndList
+
 
 @Suppress("UNCHECKED_CAST")
 class DetailViewModel constructor(private val itemId:Int, private val repository: Repository = Graph.repository): ViewModel() {
@@ -29,31 +31,25 @@ class DetailViewModel constructor(private val itemId:Int, private val repository
 
         addListItem()
         getStores()
-        if(itemId != -1) {
+        if (itemId != -1) {
 
             viewModelScope.launch {
 
-                repository.getItemWithStoreAndListFilteredById(itemId).collectLatest {
-
-                    state = state.copy(
-
-                        item = it.item.itemName,
-                        store = it.store.storeName,
-                        date = it.item.date,
-                        category = Utils.category.find {c ->
-
-                            c.id == it.shoppingList.id
-
-
-                        } ?: Category(),
-                        qty = it.item.qty
-
-                    )
+                repository.getItemWithStoreAndListFilteredById(itemId).collectLatest { resultList ->
+                    resultList.forEach { result ->
+                        state = state.copy(
+                            item = result.item.itemName,  // Acessando o nome do item
+                            store = result.store.storeName,  // Acessando o nome da loja
+                            date = result.item.date,  // Acessando a data do item
+                            category = Utils.category.find { c -> c.id == result.shoppingList.id }
+                                ?: Category(),
+                            qty = result.item.qty  // Acessando a quantidade do item
+                        )
+                    }
                 }
             }
         }
     }
-
     init {
 
         state = if(itemId != -1) {
@@ -171,14 +167,20 @@ class DetailViewModelFactor(private val id: Int): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
         return DetailViewModel(itemId = id) as T
+    }
+
+
+    data class DetailState(
+        val storeList: List<Store> = emptyList(),
+        val item: String = "",
+        val store: String = "",
+        val date: java.util.Date = java.util.Date(),
+        val qty: String = "",
+        val isScreenDialogDismissed: Boolean = true,
+        val isUpdatingItem: Boolean = false,
+        val category: Category = Category(),
+    )
+
+
 }
-
-
-data class DetailState(val storeList:List<Store> = emptyList(),
-                       val item:String = "", val store:String = "",
-                       val date: java.util.Date = java.util.Date(), val qty:String = "",
-                       val isScreenDialogDismissed:Boolean = false,
-                       val isUpdatingItem:Boolean = false, val category: Category = Category(),
-)
-
 

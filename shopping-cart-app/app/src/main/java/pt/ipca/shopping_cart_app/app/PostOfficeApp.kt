@@ -87,8 +87,10 @@ import pt.ipca.shopping_cart_app.Screens.SignUpScreen
 import pt.ipca.shopping_cart_app.Screens.TermsAndConditionsScreen
 import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
 import pt.ipca.shopping_cart_app.navigation.Screen
+import pt.ipca.shopping_cart_app.ui.detail.Detail
+import pt.ipca.shopping_cart_app.ui.home.Home
 
-private const val TAG = "PostOfficeApp"
+private const val POST_OFFICE_TAG = "PostOfficeApp"
 
 @Composable
 fun PostOfficeApp(auth: FirebaseAuth) {
@@ -98,7 +100,7 @@ fun PostOfficeApp(auth: FirebaseAuth) {
     DisposableEffect(auth) {
         val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             currentUser = firebaseAuth.currentUser
-            Log.i(TAG, "AuthStateListener: ${currentUser?.email ?: "Usuário deslogado"}")
+            Log.i(POST_OFFICE_TAG, "AuthStateListener: ${currentUser?.email ?: "Utilizador deslogado"}")
         }
 
         // Adiciona o listener
@@ -107,7 +109,7 @@ fun PostOfficeApp(auth: FirebaseAuth) {
         // Remover o listener quando o Composable for descartado
         onDispose {
             auth.removeAuthStateListener(authStateListener)
-            Log.i(TAG, "AuthStateListener removido")
+            Log.i(POST_OFFICE_TAG, "AuthStateListener removido")
         }
     }
 
@@ -118,7 +120,7 @@ fun PostOfficeApp(auth: FirebaseAuth) {
                     LoginScreen(
                         onLoginSuccess = { user ->
                             currentUser = user
-                            PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
+                            PostOfficeAppRouter.navigateTo(Screen.Home)
                         },
                         onNavigateToSignUp = {
                             PostOfficeAppRouter.navigateTo(Screen.SignUpScreen)
@@ -130,7 +132,7 @@ fun PostOfficeApp(auth: FirebaseAuth) {
                     SignUpScreen(
                         onSignUpSuccess = { user ->
                             currentUser = user
-                            PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
+                            PostOfficeAppRouter.navigateTo(Screen.Home)
                         },
                         onNavigateToLogin = {
                             PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
@@ -153,13 +155,26 @@ fun PostOfficeApp(auth: FirebaseAuth) {
                 }
 
 
-                is Screen.HomeScreen -> {
-                    HomeScreen(
+                is Screen.Home -> {
+                    Home(
                         auth = auth,
                         onLogout = {
                             auth.signOut()
                             PostOfficeAppRouter.navigateTo(Screen.LoginScreen) // Redireciona para Login após logout
-                        }
+                        },
+                        onNavigate = {}
+                    )
+                }
+
+                is Screen.Detail -> {
+                    Detail(
+                        auth = auth,
+                        onLogout = {
+                            auth.signOut()
+                            PostOfficeAppRouter.navigateTo(Screen.LoginScreen) // Redireciona para Login após logout
+                        },
+                        navigateUp = {},
+                        id = 1
                     )
                 }
 

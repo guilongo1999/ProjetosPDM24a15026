@@ -19,7 +19,7 @@ import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
 import pt.ipca.shopping_cart_app.navigation.Screen
 
 
-private const val TAG = "HomeScreen"
+private const val HOME_SCREEN_TAG = "HomeScreen"
 
 
 @Composable
@@ -66,7 +66,7 @@ fun HomeScreenPreview() {
     val auth = FirebaseAuth.getInstance() //simulado porque e impossivel fazer a autenticacao real no preview
 
 
-    HomeScreen(auth = auth, onLogout = {Log.i(TAG, "Login Out")})
+    HomeScreen(auth = auth, onLogout = {Log.i(HOME_SCREEN_TAG, "Login Out")})
 
 
 
