@@ -26,7 +26,7 @@ import pt.ipca.news_app.util.DateFormatter
 fun NewsArticleCard(
 
     modifier: Modifier = Modifier,
-    data:Result,
+    data: Result,
     onCarClicked: (Result) -> Unit
 
 ) {

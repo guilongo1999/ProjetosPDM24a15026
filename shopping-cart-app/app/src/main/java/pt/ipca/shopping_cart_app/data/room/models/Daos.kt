@@ -6,8 +6,9 @@ import androidx.room.Embedded
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Relation
+import androidx.room.Transaction
 import androidx.room.Update
-import pt.ipca.shopping_cart_app.data.room.models.Item
 import kotlinx.coroutines.flow.Flow
 
 
@@ -20,6 +21,9 @@ interface ItemDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(item: Item)
+
+   // @Query("SELECT * FROM items WHERE listId = :categoryId")
+   // fun getItemsFilteredByCategoryId(categoryId: Int): Flow<List<Item>>
 
     @Delete
     suspend fun delete(item: Item)
@@ -63,38 +67,57 @@ interface ListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
    suspend fun insertShoppingList(shoppingList: ShoppingList)
 
+
    @Query("""  SELECT * FROM  items AS  I INNER JOIN shopping_list AS S ON I.listId = S.list_id
-    INNER JOIN stores AS ST ON I.storeIdFK = S.list_id""")
+    INNER JOIN stores AS ST ON I.storeIdFk = ST.store_id""")
 
-   fun getItemsWithStoreList():Flow<List<ItemsWithStoreAndList>>
+   fun getItemsWithStoreAndList():Flow<List<ItemsWithStoreAndList>>
+
+
+    @Query("""  
+    SELECT * FROM items AS I
+    INNER JOIN shopping_list AS S ON I.listId = S.list_id
+    INNER JOIN stores AS ST ON I.storeIdFk = ST.store_id
+    WHERE S.list_id = :listId
+""")
+    fun getItemsWithStoreAndListFilteredById(listId: Int): Flow<List<ItemsWithStoreAndList>>
+
 
     @Query("""  SELECT * FROM  items AS  I INNER JOIN shopping_list AS S ON I.listId = S.list_id
-    INNER JOIN stores AS ST ON I.storeIdFK = ST.store_id WHERE ST.listIdFK =:listId """)
+    INNER JOIN stores AS ST ON I.storeIdFk = ST.store_id WHERE I.item_id =:itemId """)
 
-    fun getItemsWithStoreListFilteredById(listId: Int):Flow<List<ItemsWithStoreAndList>>
+    fun getItemWithStoreAndListFilteredById(itemId: Int):Flow<ItemsWithStoreAndList>
 
-    @Query("""  SELECT * FROM  items AS  I INNER JOIN shopping_list AS S ON I.listId = S.list_id
-    INNER JOIN stores AS ST ON I.storeIdFK = ST.store_id WHERE I.item_id =:itemId """)
+    @Query("SELECT COUNT(*) FROM shopping_list WHERE list_id = :listId")
+    fun countListById(listId: Int): Int
 
-    fun getItemWithStoreListFilteredById(itemId: Int):Flow<ItemsWithStoreAndList>
+
+
+
 
 }
 
+//-------------------------------------------------------------------------------
 
-/*
-interface ListDao {
+@Dao
+interface SavedListsDao {
+    @Insert
+    suspend fun insertList(savedList: SavedList): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertShoppingList(shoppingList: ShoppingList)
+    @Insert
+    suspend fun insertListItems(items: List<SavedListItem>)
 
-    @Query("""  SELECT * FROM  items AS  I INNER JOIN shopping_list AS S ON I.listIdFK = S.list_id
-    INNER JOIN stores AS ST ON I.storeIdFK = S.list_id""")
-
-    fun getItemsWithStoreAndList()
-
+    @Transaction
+    @Query("SELECT * FROM saved_lists")
+    fun getSavedListsWithItems(): Flow<List<SavedListWithItems>>
 }
 
-*/
+
+
+//--------------------------------------------------------------------------------------
+
+
+
 
 
 

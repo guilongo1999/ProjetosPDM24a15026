@@ -1,14 +1,26 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.android") version "1.9.10"
     id("com.google.gms.google-services")
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+
 
 }
 
 android {
     namespace = "pt.ipca.shopping_cart_app"
     compileSdk = 34
+
+    kapt {
+        correctErrorTypes = true
+        useBuildCache = true
+        arguments {
+            arg("kapt.incremental.apt", "true")
+        }
+    }
+
+
 
     defaultConfig {
         applicationId = "pt.ipca.shopping_cart_app"
@@ -64,6 +76,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.paging:paging-compose:3.3.2")
+
+
 
 
     //-----------------------------------------------------------novas implementacoes UI----------------------------------------------------------------------------
@@ -96,6 +111,16 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
+
+    //-----------------------------------------------------------------------------------------
+    implementation("com.google.dagger:hilt-android:2.48")
+    //implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+
+    // Hilt Navigation Compose
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
+
 
     //------------------------------------------------------------------implementaion material
 

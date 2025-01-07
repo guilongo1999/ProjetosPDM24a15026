@@ -80,6 +80,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import pt.ipca.shopping_cart_app.Screens.HomeScreen
 import pt.ipca.shopping_cart_app.Screens.LoginScreen
@@ -87,107 +88,44 @@ import pt.ipca.shopping_cart_app.Screens.SignUpScreen
 import pt.ipca.shopping_cart_app.Screens.TermsAndConditionsScreen
 import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
 import pt.ipca.shopping_cart_app.navigation.Screen
+//import pt.ipca.shopping_cart_app.ui.AppNavigationHomeDetail
+import pt.ipca.shopping_cart_app.ui.AuthRoutes
+import pt.ipca.shopping_cart_app.ui.Routes
 import pt.ipca.shopping_cart_app.ui.detail.Detail
 import pt.ipca.shopping_cart_app.ui.home.Home
 
 private const val POST_OFFICE_TAG = "PostOfficeApp"
 
+
+
 @Composable
-fun PostOfficeApp(auth: FirebaseAuth) {
-    var currentUser by remember { mutableStateOf(auth.currentUser) }
-
-    // Usando DisposableEffect para monitorar o estado do usuário e remover o listener
-    DisposableEffect(auth) {
-        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            currentUser = firebaseAuth.currentUser
-            Log.i(POST_OFFICE_TAG, "AuthStateListener: ${currentUser?.email ?: "Utilizador deslogado"}")
-        }
-
-        // Adiciona o listener
-        auth.addAuthStateListener(authStateListener)
-
-        // Remover o listener quando o Composable for descartado
-        onDispose {
-            auth.removeAuthStateListener(authStateListener)
-            Log.i(POST_OFFICE_TAG, "AuthStateListener removido")
-        }
-    }
-
+fun PostOfficeApp(auth: FirebaseAuth, navController: NavController) {
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-        Crossfade(targetState = PostOfficeAppRouter.currentScreen) { currentState ->
-            when (currentState.value) {
-                is Screen.LoginScreen -> {
-                    LoginScreen(
-                        onLoginSuccess = { user ->
-                            currentUser = user
-                            PostOfficeAppRouter.navigateTo(Screen.Home)
-                        },
-                        onNavigateToSignUp = {
-                            PostOfficeAppRouter.navigateTo(Screen.SignUpScreen)
-                        }
-                    )
+        LoginScreen(
+            onLoginSuccess = { authUser ->
+                if (authUser != null) {
+                    Log.i(POST_OFFICE_TAG, "Login efetuado: ${authUser.email}")
+                    // Navegar para a tela Home após login
+                    navController.navigate(Routes.Home.name)
                 }
-
-                is Screen.SignUpScreen -> {
-                    SignUpScreen(
-                        onSignUpSuccess = { user ->
-                            currentUser = user
-                            PostOfficeAppRouter.navigateTo(Screen.Home)
-                        },
-                        onNavigateToLogin = {
-                            PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-                        }
-                    )
-                }
-
-                is Screen.TermsAndConditionsScreen -> {
-                    if (currentUser != null) {
-                        TermsAndConditionsScreen(
-                            onLogout = {
-                                auth.signOut() // Realiza o logout
-                                PostOfficeAppRouter.navigateTo(Screen.LoginScreen) // Redireciona para Login
-                            }
-                        )
-                    } else {
-                        // Se não houver um usuário autenticado, navega para Login
-                        PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-                    }
-                }
-
-
-                is Screen.Home -> {
-                    Home(
-                        auth = auth,
-                        onLogout = {
-                            auth.signOut()
-                            PostOfficeAppRouter.navigateTo(Screen.LoginScreen) // Redireciona para Login após logout
-                        },
-                        onNavigate = {}
-                    )
-                }
-
-                is Screen.Detail -> {
-                    Detail(
-                        auth = auth,
-                        onLogout = {
-                            auth.signOut()
-                            PostOfficeAppRouter.navigateTo(Screen.LoginScreen) // Redireciona para Login após logout
-                        },
-                        navigateUp = {},
-                        id = 1
-                    )
-                }
-
-                else -> {
-                    // Redireciona para a tela de Login caso não haja estado válido
-                    if (currentUser == null) {
-                        PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-                    } else {
-                        PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
-                    }
-                }
+            },
+            onNavigateToSignUp = {
+                Log.i(POST_OFFICE_TAG, "Navegação para tela de cadastro.")
+                // Navegar para a tela de cadastro
+                navController.navigate(AuthRoutes.SignUp.name)
+            },
+            onNavigateToTerms = {
+                Log.i(POST_OFFICE_TAG, "Navegação para tela de termos e condições.")
+                // Navegar para a tela de termos
+                navController.navigate(AuthRoutes.TermsAndConditions.name)
             }
-        }
+        )
     }
 }
+
+
+
+
+
+
 

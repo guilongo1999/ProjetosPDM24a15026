@@ -15,8 +15,17 @@ object Utils {
 }
 
 data class Category(
-    @DrawableRes val resId: Int = -1,
-    val title: String = "",
     val id: Int = -1,
+    val title: String = "",
+    @DrawableRes val resId: Int = -1
 )
 
+/*{
+  override fun equals(other: Any?): Boolean {
+       if (this === other) return true
+       if (other !is Category) return false
+       return id == other.id
+   }
+}
+
+   */

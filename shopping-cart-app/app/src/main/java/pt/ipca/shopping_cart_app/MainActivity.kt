@@ -92,39 +92,71 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
+import pt.ipca.shopping_cart_app.Screens.TermsAndConditionsScreen
 import pt.ipca.shopping_cart_app.app.PostOfficeApp
+//import pt.ipca.shopping_cart_app.ui.AppNavigationHomeDetail
+//import pt.ipca.shopping_cart_app.ui.AuthNavigation
+//import pt.ipca.shopping_cart_app.ui.AuthNavigationFlow
+import pt.ipca.shopping_cart_app.ui.NavControllerNavigation
+//import pt.ipca.shopping_cart_app.ui.appNavigationHomeDetail
 import pt.ipca.shopping_cart_app.ui.detail.Detail
 import pt.ipca.shopping_cart_app.ui.home.Home
 
-private const val MAIN_TAG = "MainActivity"
-private const val HOME_TAG = "Home"
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    // Variável para Firebase Authentication
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inicializar Firebase Authentication
         auth = FirebaseAuth.getInstance()
-        Log.i(MAIN_TAG, "onCreate utilizador atual: ${auth.currentUser?.email ?: "Nenhum usuário autenticado"}")
 
         setContent {
-            // Passar a instância de auth para o PostOfficeApp
-            //PostOfficeApp(auth = auth)
-            
-            Detail(navigateUp = {}, auth = auth, onLogout = {Log.i(HOME_TAG, "Login Out")}, id = 1)
+
+            NavControllerNavigation(auth = auth)
+
+
         }
     }
 }
 
+/*
 
+@Composable
+fun AuthFlow(auth: FirebaseAuth) {
+    var isAuthenticated by remember { mutableStateOf(auth.currentUser != null) }
 
+    DisposableEffect(auth) {
+        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            isAuthenticated = firebaseAuth.currentUser != null
+        }
+        auth.addAuthStateListener(authStateListener)
+        onDispose { auth.removeAuthStateListener(authStateListener) }
+    }
 
+    if (isAuthenticated) {
+        AppNavigationHomeDetail(
+            auth = auth,
+            onLogout = {
+                isAuthenticated = false // Força a navegação de volta para Login
+            }
+        )
+    } else {
+        AuthNavigation(
+            auth = auth)
+    }
+}
 
+ */
 
 
 

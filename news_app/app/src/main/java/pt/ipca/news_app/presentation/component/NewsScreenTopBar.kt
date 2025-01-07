@@ -24,7 +24,7 @@ fun NewsScreenTopBar(
 
     TopAppBar(
         scrollBehavior = scrollBehavior,
-        title = { Text(text = "NewsRoom", fontWeight = FontWeight.Bold) },
+        title = { Text(text = "News", fontWeight = FontWeight.Bold) },
         actions = {
             IconButton(onClick = onSearchIconClicked) {
                 

@@ -136,21 +136,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import pt.ipca.shopping_cart_app.Components.UnderlineSignUpText
+import pt.ipca.shopping_cart_app.ui.AuthRoutes
 
 const val SIGN_UP_TAG = "SignUpScreen"
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    onSignUpSuccess: (user: com.google.firebase.auth.FirebaseUser?) -> Unit,
-    onNavigateToLogin: () -> Unit
+    onSignUpSuccess: (FirebaseUser) -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToTerms: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val auth = FirebaseAuth.getInstance()
+    var isNavigating by remember { mutableStateOf(false) } // Flag para navegação controlada
+
 
     Column(
         modifier = Modifier
@@ -206,7 +212,7 @@ fun SignUpScreen(
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.i(SIGN_UP_TAG, "Sign up successful")
-                            onSignUpSuccess(auth.currentUser)
+                            auth.currentUser?.let { onSignUpSuccess(it) }
                         } else {
                             val error = task.exception?.localizedMessage ?: "Sign up failed"
                             Log.e(SIGN_UP_TAG, error)
@@ -221,23 +227,42 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        CheckBoxComponent(value = stringResource(id = R.string.terms_and_conditions),
-            onTextSelected = {
+       // CheckBoxComponent(value = stringResource(id = R.string.terms_and_conditions),
+         //   onTextSelected = {
 
-                PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
+//                Log.d("TermsAndConditionsScreen", "TermsAndConditionsScreen from sign up")
+
+                //PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
+
+
+  //          }
+    //    )
+
+        TextButton(onClick = {
+            if (!isNavigating) {
+                isNavigating = true
+                Log.d("onNavigaetToTerms", "Navigate to Terms from Login")
+                onNavigateToTerms()  // Navegar para os Termos
+                isNavigating = false
             }
-        )
-
-
-
+        }) {
+            Text("Terms and Conditions")
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-
-        // Login Navigation Button
-        TextButton(onClick = onNavigateToLogin) {
-            Text("Already have an account? Log in")
+        // Botão de navegação para a tela de Login
+        TextButton(onClick = {
+            if (!isNavigating) {
+                isNavigating = true
+                Log.d("LoginScreen", "Navigate to Login")
+                onNavigateToLogin()  // Navegar para a tela de SignUp
+                isNavigating = false
+            }
+        }) {
+            Text("Don't have an account? Sign Up")
         }
+
 
         // Error Message
         if (errorMessage != null) {

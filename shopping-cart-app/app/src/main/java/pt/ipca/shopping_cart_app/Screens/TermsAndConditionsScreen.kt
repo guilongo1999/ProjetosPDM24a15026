@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseUser
 import pt.ipca.shopping_cart_app.Components.SignUpText
 import pt.ipca.shopping_cart_app.R
 import pt.ipca.shopping_cart_app.navigation.BackButtonHandler
@@ -23,14 +25,16 @@ import pt.ipca.shopping_cart_app.navigation.Screen
 
 private const val TERMS_TAG = "TermsAndConditionsScreen"
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TermsAndConditionsScreen(onLogout:() -> Unit) {
+fun TermsAndConditionsScreen(onNavigateToSignUp: () -> Unit) {
 
-    BackButtonHandler {
+   // BackButtonHandler {
 
-        PostOfficeAppRouter.navigateTo(Screen.SignUpScreen)
-    }
+     //   onNavigateToSignUp()
+
+
+   // }
 
     // Estrutura principal da tela
     Surface(
@@ -53,32 +57,38 @@ fun TermsAndConditionsScreen(onLogout:() -> Unit) {
 
             Button(
                 onClick = {
-                    PostOfficeAppRouter.navigateTo(Screen.SignUpScreen)
+                    onNavigateToSignUp()
                 },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
                 Text("Go Back to Sign Up")
             }
 
-            Button(onClick = onLogout) {
-                Text("Logout")
+           // Button(onClick = onNavigateBack) {
+            //    Text("NavigateBack")
 
-            }
+           // }
+
+
         }
     }
 
 
 }
 
-
+/*
 
 @Preview
 @Composable
 fun TermsAndConditionsScreenPreview() {
 
-    TermsAndConditionsScreen(onLogout = {Log.i(TERMS_TAG, "Login Out")})
+    TermsAndConditionsScreen(onNavigateToSignUp = {})
 
 
 
 
 }
+
+ */
+
+

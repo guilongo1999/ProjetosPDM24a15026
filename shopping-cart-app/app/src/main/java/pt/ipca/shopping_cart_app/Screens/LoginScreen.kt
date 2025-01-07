@@ -63,24 +63,27 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import pt.ipca.shopping_cart_app.Components.CheckBoxComponent
 import pt.ipca.shopping_cart_app.Components.UnderlineSignUpText
 import pt.ipca.shopping_cart_app.R
 import pt.ipca.shopping_cart_app.navigation.PostOfficeAppRouter
 import pt.ipca.shopping_cart_app.navigation.Screen
 
-private const val LOGIN_TAG = "LoginScreen"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginSuccess: (user: com.google.firebase.auth.FirebaseUser?) -> Unit,
-    onNavigateToSignUp: () -> Unit
+    onLoginSuccess: (FirebaseUser) -> Unit,
+    onNavigateToSignUp: () -> Unit,
+    onNavigateToTerms: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val auth = FirebaseAuth.getInstance()
+    var isLoading by remember { mutableStateOf(false) } // Indicador de loading
+    var isNavigating by remember { mutableStateOf(false) } // Flag para navegação controlada
+
 
     Column(
         modifier = Modifier
@@ -93,7 +96,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Email Field
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -103,7 +105,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Password Field
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -114,58 +115,84 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Login Button
+        // Botão de login
         Button(
             onClick = {
+                isLoading = true // Define o estado de carregamento
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
+                        isLoading = false // Finaliza o estado de carregamento
                         if (task.isSuccessful) {
-                            Log.i(LOGIN_TAG, "Login successful")
-                            onLoginSuccess(auth.currentUser)
+                            Log.i("LoginScreen", "Login successful")
+                            auth.currentUser?.let { onLoginSuccess(it) } // Chama o sucesso do login
                         } else {
                             val error = task.exception?.localizedMessage ?: "Login failed"
-                            Log.e(LOGIN_TAG, error)
+                            Log.e("LoginScreen", error)
                             errorMessage = error
                         }
                     }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading // Desabilita o botão enquanto carrega
         ) {
             Text("Login")
         }
 
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        CheckBoxComponent(value = stringResource(id = R.string.terms_and_conditions),
-            onTextSelected = {
-
-                PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
-            }
-        )
-
-
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        // Sign Up Navigation Button
-        TextButton(onClick = onNavigateToSignUp) {
-            Text("Don't have an account? Sign Up")
-        }
-
-        // Error Message
+        // Mensagem de erro
         if (errorMessage != null) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = errorMessage ?: "", color = MaterialTheme.colorScheme.error)
         }
+
+        // Se estiver carregando, mostra um indicador de carregamento
+        if (isLoading) {
+            CircularProgressIndicator()
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+
+
+        TextButton(onClick = {
+            if (!isNavigating) {
+                isNavigating = true
+                Log.d("onNavigaetToTerms", "Navigate to Terms from Login")
+                onNavigateToTerms()  // Navegar para os Termos
+                isNavigating = false
+            }
+        }) {
+            Text("Terms and Conditions")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Botão de navegação para a tela de SignUp
+        TextButton(onClick = {
+            if (!isNavigating) {
+                isNavigating = true
+                Log.d("LoginScreen", "Navigate to SignUp")
+                onNavigateToSignUp()  // Navegar para a tela de SignUp
+                isNavigating = false
+            }
+        }) {
+            Text("Don't have an account? Sign Up")
+        }
+
+
+
+
     }
+
+
 }
 
 
 
 
+
+
+/*
 @Preview
 @Composable
 fun LoginScreenPreview() {
@@ -174,8 +201,9 @@ fun LoginScreenPreview() {
        onLoginSuccess = {user ->
            Log.i(LOGIN_TAG, "Login Success with user: $user")
        },
-        onNavigateToSignUp = {
-            Log.i(LOGIN_TAG, "Navigating to SignUp Screen")
-        }
+        onNavigateToTerms = {}
     )
 }
+
+
+ */

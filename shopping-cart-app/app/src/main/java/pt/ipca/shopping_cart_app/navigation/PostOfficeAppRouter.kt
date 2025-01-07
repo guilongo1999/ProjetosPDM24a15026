@@ -10,9 +10,9 @@ sealed class Screen() {
     object SignUpScreen: Screen()
     object TermsAndConditionsScreen: Screen()
     object LoginScreen: Screen()
-    object HomeScreen: Screen()
+   // object HomeScreen: Screen()
     object Home: Screen()
-    object Detail: Screen()
+    //object Detail: Screen()
 }
 
 

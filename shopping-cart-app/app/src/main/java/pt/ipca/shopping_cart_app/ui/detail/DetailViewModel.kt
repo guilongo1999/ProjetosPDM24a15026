@@ -1,186 +1,205 @@
 package pt.ipca.shopping_cart_app.ui.detail
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import pt.ipca.shopping_cart_app.Graph
 import pt.ipca.shopping_cart_app.data.room.models.Item
 import pt.ipca.shopping_cart_app.data.room.models.ShoppingList
 import pt.ipca.shopping_cart_app.data.room.models.Store
 import pt.ipca.shopping_cart_app.ui.Category
 import pt.ipca.shopping_cart_app.ui.Utils
 import pt.ipca.shopping_cart_app.ui.repository.Repository
-//import java.util.Date
-//import java.sql.Date
-import java.time.LocalDate
-import pt.ipca.shopping_cart_app.data.room.models.ItemsWithStoreAndList
+import java.util.Date
+import javax.inject.Inject
 
 
-@Suppress("UNCHECKED_CAST")
-class DetailViewModel constructor(private val itemId:Int, private val repository: Repository = Graph.repository): ViewModel() {
+@HiltViewModel
+class DetailViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val repository: Repository
+) : ViewModel() {
 
-    var state by mutableStateOf(DetailViewModelFactor.DetailState())
+    var state by mutableStateOf(DetailState())
         private set
 
     init {
+        val itemId = savedStateHandle.get<Int>("itemId") ?: -1
+        Log.d("DetailViewModel", "itemId recuperado: $itemId")
+        initializeState(itemId)
+    }
 
-        addListItem()
-        getStores()
-        if (itemId != -1) {
-
-            viewModelScope.launch {
-
-                repository.getItemWithStoreAndListFilteredById(itemId).collectLatest { resultList ->
-                    resultList.forEach { result ->
-                        state = state.copy(
-                            item = result.item.itemName,  // Acessando o nome do item
-                            store = result.store.storeName,  // Acessando o nome da loja
-                            date = result.item.date,  // Acessando a data do item
-                            category = Utils.category.find { c -> c.id == result.shoppingList.id }
-                                ?: Category(),
-                            qty = result.item.qty  // Acessando a quantidade do item
-                        )
-                    }
-                }
+    fun loadItem(id: Int) {
+        viewModelScope.launch {
+            repository.getItemWithStoreAndList(id).collectLatest { result ->
+                state = state.copy(
+                    item = result.item.itemName,
+                    store = result.store.storeName,
+                    date = result.item.date,
+                    qty = result.item.qty,
+                    category = Utils.category.find { it.id == result.shoppingList.id }
+                        ?: Category(id = -1, title = "None")
+                )
             }
         }
     }
-    init {
 
-        state = if(itemId != -1) {
+    fun resetState() {
+        state = state.copy(
+            item = "",
+            store = "",
+            qty = "",
+            date = Date(),
+            category = Category(),
+            isUpdatingItem = false
+        )
+        addDefaultCategories()
+        fetchStores()
+    }
 
-            state.copy(isUpdatingItem = true)
-        } else {
 
-            state.copy(isUpdatingItem = false)
+    private fun initializeState(itemId: Int) {
+        state = state.copy(isUpdatingItem = itemId != -1)
+        addDefaultCategories()
+        fetchStores()
+        if (itemId != -1) {
+            loadItemDetails(itemId)
+        }
+    }
+
+    private fun loadItemDetails(itemId: Int) {
+        viewModelScope.launch {
+            repository.getItemWithStoreAndList(itemId).collectLatest { result ->
+                state = state.copy(
+                    item = result.item.itemName,
+                    store = result.store.storeName,
+                    date = result.item.date,
+                    qty = result.item.qty,
+                    category = Utils.category.find { it.id == result.shoppingList.id }
+                        ?: Category(id = -1, title = "None")
+                )
+            }
         }
     }
 
 
 
-    val isFieldsNotEmpty:Boolean
+
+
+
+    private fun addDefaultCategories() {
+        viewModelScope.launch {
+            Utils.category.forEach { category ->
+                repository.insertList(ShoppingList(id = category.id, name = category.title))
+            }
+        }
+    }
+
+    private fun fetchStores() {
+        viewModelScope.launch {
+            repository.store.collectLatest { stores ->
+                state = state.copy(storeList = stores)
+            }
+        }
+    }
+
+    val isFieldsNotEmpty: Boolean
         get() = state.item.isNotEmpty() && state.store.isNotEmpty() && state.qty.isNotEmpty()
 
-    fun onItemChange(newValue:String) {state = state.copy(item = newValue)}
+    fun onItemChange(newValue: String) {
+        Log.d("DetailViewModel", "onItemChange: $newValue")
+        state = state.copy(item = newValue)
+    }
 
-    fun onStoreChange(newValue:String) {state = state.copy(store = newValue)}
+    fun onStoreChange(newValue: String) {
+        state = state.copy(store = newValue)
+    }
 
-    fun onQtyChange(newValue:String) {state = state.copy(qty = newValue)}
+    fun onQtyChange(newValue: String) {
+        state = state.copy(qty = newValue)
+    }
 
-    fun onDateChange(newValue: java.sql.Date) {state = state.copy(date = newValue)}
+    fun onDateChange(newValue: Date) {
+        state = state.copy(date = newValue)
+    }
 
-    fun onCategoryChange(newValue:Category) {state = state.copy(category = newValue)}
+    fun onCategoryChange(newValue: Category) {
+        state = state.copy(category = newValue)
+    }
 
-    fun onScreenDialogDismissed(newValue:Boolean) {state = state.copy(isScreenDialogDismissed = newValue)}
-
-    fun onUpdatingItem(newValue:Boolean) {state = state.copy(isUpdatingItem = newValue)}
-
-    private fun addListItem() {
-
-        viewModelScope.launch { Utils.category.forEach {
-
-            repository.insertList(
-
-                ShoppingList(
-
-                    id = it.id,
-                    name = it.title
-                )
-            )
-        } }
+    fun onScreenDialogDismissed(newValue: Boolean) {
+        state = state.copy(isScreenDialogDismissed = newValue)
     }
 
     fun addShoppingItem() {
-
         viewModelScope.launch {
-
             repository.insertItem(
-
-                Item(
-
-                    itemName = state.item,
-                    listId = state.category.id,
-                    date = java.sql.Date(state.date.time),
-                    qty = state.qty,
-                    storeIdFK = state.storeList.find { it.storeName == state.store }?.id ?: 0,
-                    isChecked = false
-                )
+                createItem()
             )
         }
     }
 
-    fun updateShoppingItem(id:Int) {
-
+    fun updateShoppingItem(id: Int) {
         viewModelScope.launch {
-
             repository.insertItem(
-
-                Item(
-
-                    itemName = state.item,
-                    listId = state.category.id,
-                    date = java.sql.Date(state.date.time),
-                    qty = state.qty,
-                    storeIdFK = state.storeList.find { it.storeName == state.store }?.id ?: 0,
-                    isChecked = false,
-                    id = id
-                )
+                createItem(id)
             )
         }
+    }
+
+    private fun createItem(id: Int? = null): Item {
+        val storeId = state.storeList.find { it.storeName == state.store }?.id ?: 0
+        return Item(
+            id = id ?: 0,
+            itemName = state.item,
+            listId = state.category.id,
+            date = state.date,
+            qty = state.qty,
+            storeIdFk = storeId,
+            isChecked = false
+        )
     }
 
     fun addStore() {
-
         viewModelScope.launch {
-
             repository.insertStore(
-
                 Store(
-
                     storeName = state.store,
-                    listIdFK = state.category.id
+                    listIdFk = state.category.id
                 )
             )
         }
     }
 
-    fun getStores() {
-
+    fun saveShoppingItem(item: Item) {
         viewModelScope.launch {
-
-            repository.store.collectLatest {
-
-                state = state.copy(storeList = it)
-            }
+            Log.d("DetailViewModel", "Tentando inserir item: $item")
+            repository.insertItem(item)
         }
     }
-
 }
 
-class DetailViewModelFactor(private val id: Int): ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-
-        return DetailViewModel(itemId = id) as T
-    }
-
-
-    data class DetailState(
-        val storeList: List<Store> = emptyList(),
-        val item: String = "",
-        val store: String = "",
-        val date: java.util.Date = java.util.Date(),
-        val qty: String = "",
-        val isScreenDialogDismissed: Boolean = true,
-        val isUpdatingItem: Boolean = false,
-        val category: Category = Category(),
-    )
+data class DetailState(
+    val storeList: List<Store> = emptyList(),
+    val item: String = "",
+    val store: String = "",
+    val date: Date = Date(),
+    val qty: String = "",
+    val isScreenDialogDismissed: Boolean = true,
+    val isUpdatingItem: Boolean = false,
+    val category: Category = Category(),
+)
 
 
-}
+
 
